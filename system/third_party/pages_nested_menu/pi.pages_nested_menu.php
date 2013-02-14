@@ -1,15 +1,13 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 $plugin_info = array(
-    'pi_name'           => 'Pages &ndash; Nested Menu',
+    'pi_name'           => 'Pages - Nested Menu',
     'pi_version'        => '2.0.0',
     'pi_author'         => 'Original development by Mark Huot. Updated for EE2.x by Nathan Pitman',
     'pi_author_url'     => 'https://github.com/ninefour/pages_nested_menu.pi.ee_addon',
     'pi_description'    => 'Nested List of Pages',
     'pi_usage'          => Pages_nested_menu::usage()
 );
-
-
 
 class Pages_nested_menu {
 
@@ -70,20 +68,20 @@ class Pages_nested_menu {
         //  =============================================
         //  Get Full Titles
         //  =============================================
-        if(!isset($this->EE->session->cache['mh_pages_exp_channel_titles_data']))
+        if(!isset($this->EE->session->cache['nf_pages_exp_channel_titles_data']))
         {
-            $this->EE->session->cache['mh_pages_exp_channel_titles_data'] = $this->EE->db->query('SELECT * FROM exp_channel_titles t, exp_channel_data d WHERE t.entry_id IN ('.implode(',', array_keys($pages[1]['uris'])).') AND t.entry_id=d.entry_id ORDER BY t.entry_id='.implode(' DESC, t.entry_id=', array_keys($pages[1]['uris'])).' DESC');
+            $this->EE->session->cache['nf_pages_exp_channel_titles_data'] = $this->EE->db->query('SELECT * FROM exp_channel_titles t, exp_channel_data d WHERE t.entry_id IN ('.implode(',', array_keys($pages[1]['uris'])).') AND t.entry_id=d.entry_id ORDER BY t.entry_id='.implode(' DESC, t.entry_id=', array_keys($pages[1]['uris'])).' DESC');
         }
         
         //  =============================================
         //  Get Custom Fields
         //  =============================================
-        if(!isset($this->EE->session->cache['mh_pages_exp_channel_fields']))
+        if(!isset($this->EE->session->cache['nf_pages_exp_channel_fields']))
         {
-            $this->EE->session->cache['mh_pages_exp_channel_fields'] = $this->EE->db->query('SELECT * FROM exp_channel_fields');
+            $this->EE->session->cache['nf_pages_exp_channel_fields'] = $this->EE->db->query('SELECT * FROM exp_channel_fields');
         }
         
-        foreach($this->EE->session->cache['mh_pages_exp_channel_fields']->result_array as $cfield)
+        foreach($this->EE->session->cache['nf_pages_exp_channel_fields']->result_array as $cfield)
         {
             $this->cfields[$cfield['field_id']] = $cfield['field_name'];
         }
@@ -91,13 +89,13 @@ class Pages_nested_menu {
         //  =============================================
         //  Rewrite Titles Table
         //  =============================================
-        foreach($this->EE->session->cache['mh_pages_exp_channel_titles_data']->result_array as $key => $result)
+        foreach($this->EE->session->cache['nf_pages_exp_channel_titles_data']->result_array as $key => $result)
         {
             foreach($result as $id => $value)
             {
                 if(substr($id, 0, 9) == 'field_id_')
                 {
-                    $this->EE->session->cache['mh_pages_exp_channel_titles_data']->result[$key][$this->cfields[substr($id, 9)]] = $value;
+                    $this->EE->session->cache['nf_pages_exp_channel_titles_data']->result[$key][$this->cfields[substr($id, 9)]] = $value;
                 }
             }
         }
@@ -105,7 +103,7 @@ class Pages_nested_menu {
         //  =============================================
         //  Store Titles
         //  =============================================
-        $this->titles = $this->EE->session->cache['mh_pages_exp_channel_titles_data'];
+        $this->titles = $this->EE->session->cache['nf_pages_exp_channel_titles_data'];
         
         //  =============================================
         //  Are we ordering by a field or the title?
@@ -272,6 +270,7 @@ class Pages_nested_menu {
                 if(preg_match('/^\s*<li/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
                 {
                 
+                	// If this page equal to the current page?
                     $class = "";
                     if ($this->EE->uri->uri_string()==substr($page_path, 1)) {
                     	$class = " class='active'";
