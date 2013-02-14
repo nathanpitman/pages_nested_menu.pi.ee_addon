@@ -1,30 +1,10 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-/*
-=====================================================
- Pages Nested Menu
------------------------------------------------------
- http://docs.markhuot.com/
------------------------------------------------------
- Copyright (c) 2007-Today  -- Mark Huot
-=====================================================
- THIS IS COPYRIGHTED SOFTWARE
- PLEASE READ THE LICENSE AGREEMENT
- http://expressionengine.com/docs/license.html
-=====================================================
- File: mcp.pages_template_visual_select.php
------------------------------------------------------
- Purpose: Nested List of Pages
-=====================================================
-*/
-
-
-
 $plugin_info = array(
     'pi_name'           => 'Pages &ndash; Nested Menu',
-    'pi_version'        => '1.2.0',
-    'pi_author'         => 'Mark Huot / Nathan Pitman (updated re http://expressionengine.com/legacy_docs/installation/version_notes_1.6.9.html)',
-    'pi_author_url'     => 'http://docs.markhuot.com/',
+    'pi_version'        => '2.0.0',
+    'pi_author'         => 'Original development by Mark Huot. Updated for EE2.x by Nathan Pitman',
+    'pi_author_url'     => 'https://github.com/ninefour/pages_nested_menu.pi.ee_addon',
     'pi_description'    => 'Nested List of Pages',
     'pi_usage'          => Pages_nested_menu::usage()
 );
