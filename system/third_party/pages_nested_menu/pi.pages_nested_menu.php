@@ -271,7 +271,13 @@ class Pages_nested_menu {
                 
                 if(preg_match('/^\s*<li/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
                 {
-                    $this->return_data .= '<li>';
+                
+                    $class = "";
+                    if ($this->EE->uri->uri_string()==substr($page_path, 1)) {
+                    	$class = " class='active'";
+                    }
+                    
+                    $this->return_data .= '<li'.$class.'>';
                 }
                 
                 //  =============================================
@@ -335,7 +341,7 @@ class Pages_nested_menu {
                     
                     if($displayed)
                     {
-                        $this->return_data .= '<&#47;ul>';
+                        $this->return_data .= '</ul>';
                     }
                 }
             }
@@ -345,7 +351,7 @@ class Pages_nested_menu {
             //  =============================================
             if($displayed && preg_match('/<&#47;li>\s*$/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
             {
-                $this->return_data .= '<&#47;li>'."\r";
+                $this->return_data .= '</li>'."\r";
             }
             
             //  =============================================
