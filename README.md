@@ -1,4 +1,4 @@
-Pages - Nested Menu (pages_nested_menu.pi)
+'Pages - Nested Menu' for ExpressionEngine
 =============================
 
 This plugin creates a list of your Pages (created using the native Pages module). Basic syntax is as follows:
