@@ -9,4 +9,4 @@ This plugin creates a list of your Pages (created using the native Pages module)
 
 The current page is wrapped with a list item with a class of 'active'.
 
-Original development by Mark Huot. Updated for EE2.x by Nathan Pitman.
+Original development by [Mark Huot](https://github.com/markhuot). Updated for EE2.x by Nathan Pitman.
