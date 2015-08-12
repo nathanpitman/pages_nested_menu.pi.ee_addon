@@ -8,3 +8,5 @@ This plugin creates a list of your Pages (created using the native Pages module)
 	{/exp:pages_nested_menu}
 
 The current page is wrapped with a list item with a class of 'active'.
+
+Original development by Mark Huot. Updated for EE2.x by Nathan Pitman.
