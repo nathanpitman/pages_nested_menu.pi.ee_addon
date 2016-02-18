@@ -1,7 +1,7 @@
 'Pages - Nested Menu' for ExpressionEngine
 =============================
 
-This plugin creates a list of your Pages (created using the native Pages module). Basic syntax is as follows:
+This [ExpressionEngine](https://ellislab.com/expressionengine) plugin creates a list of your Pages (created using the native Pages module). Basic syntax is as follows:
 
 	{exp:pages_nested_menu root="/about/" include_ul="no" include_root="no" depth="1"}
 		<a href="{pnm_page_url}" title="{pnm_title}">{pnm_title}</a>
