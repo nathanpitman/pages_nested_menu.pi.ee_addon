@@ -2,9 +2,9 @@
 
 $plugin_info = array(
     'pi_name'           => 'Pages - Nested Menu',
-    'pi_version'        => '2.0.0',
+    'pi_version'        => '2.0.1',
     'pi_author'         => 'Original development by Mark Huot. Updated for EE2.x by Nathan Pitman',
-    'pi_author_url'     => 'https://github.com/ninefour/pages_nested_menu.pi.ee_addon',
+    'pi_author_url'     => 'https://github.com/nathanpitman/pages_nested_menu.pi.ee_addon',
     'pi_description'    => 'Nested List of Pages',
     'pi_usage'          => Pages_nested_menu::usage()
 );
@@ -12,17 +12,17 @@ $plugin_info = array(
 class Pages_nested_menu {
 
     var $return_data = "";
-    
+
     var $str;
     var $pages;
     var $titles;
     var $params;
     var $ordered;
-    
+
     var $cfields;
     var $nesting_path;
     var $page_counter = 1;
-    
+
     //  *********************************************
     //  Constructor!
     //  *********************************************
@@ -33,21 +33,21 @@ class Pages_nested_menu {
     {
         //global $DB, $DSP, $FNS, $IN, $PREFS, $SESS, $TMPL;
         $this->EE =& get_instance();
-        
+
         $this->return_data = '';
-        
+
         //  =============================================
         //  Get Plugin Content
         //  =============================================
         if ($str == '') $str = $this->EE->TMPL->tagdata;
         $this->str = $str;
-        
-        
+
+
         //  =============================================
         //  Get Site Pages
         //  =============================================
         $pages = $this->EE->config->item('site_pages');
-        
+
         natcasesort($pages[1]['uris']);
 
 		//  =============================================
@@ -56,7 +56,7 @@ class Pages_nested_menu {
 		unset($pages['uris']['']);
 
         $this->pages = $pages;
-        
+
         //  =============================================
         //  Are There Pages?
         //  =============================================
@@ -64,7 +64,7 @@ class Pages_nested_menu {
         //  silly processing.
         //  ---------------------------------------------
         if(count($this->pages[1]['uris']) == 0) return $str;
-        
+
         //  =============================================
         //  Get Full Titles
         //  =============================================
@@ -72,7 +72,7 @@ class Pages_nested_menu {
         {
             $this->EE->session->cache['nf_pages_exp_channel_titles_data'] = $this->EE->db->query('SELECT * FROM exp_channel_titles t, exp_channel_data d WHERE t.entry_id IN ('.implode(',', array_keys($pages[1]['uris'])).') AND t.entry_id=d.entry_id ORDER BY t.entry_id='.implode(' DESC, t.entry_id=', array_keys($pages[1]['uris'])).' DESC');
         }
-        
+
         //  =============================================
         //  Get Custom Fields
         //  =============================================
@@ -80,12 +80,12 @@ class Pages_nested_menu {
         {
             $this->EE->session->cache['nf_pages_exp_channel_fields'] = $this->EE->db->query('SELECT * FROM exp_channel_fields');
         }
-        
+
         foreach($this->EE->session->cache['nf_pages_exp_channel_fields']->result_array as $cfield)
         {
             $this->cfields[$cfield['field_id']] = $cfield['field_name'];
         }
-        
+
         //  =============================================
         //  Rewrite Titles Table
         //  =============================================
@@ -99,12 +99,12 @@ class Pages_nested_menu {
                 }
             }
         }
-        
+
         //  =============================================
         //  Store Titles
         //  =============================================
         $this->titles = $this->EE->session->cache['nf_pages_exp_channel_titles_data'];
-        
+
         //  =============================================
         //  Are we ordering by a field or the title?
         //  =============================================
@@ -120,7 +120,7 @@ class Pages_nested_menu {
                 $order = $this->EE->TMPL->fetch_param('order');
             }
         }
-        
+
         //  =============================================
         //  Parse Status Parameter
         //  =============================================
@@ -142,7 +142,7 @@ class Pages_nested_menu {
         }
         $this->params['statuses'] = $statuses;
         $this->params['statuses_state'] = $statuses_state;
-        
+
         //  =============================================
         //  Parse Root Parameter
         //  =============================================
@@ -150,7 +150,7 @@ class Pages_nested_menu {
         if($this->EE->TMPL->fetch_param('root') !== false)
         {
             $root = $this->EE->TMPL->fetch_param('root');
-            
+
             //  =============================================
             //  Fix Current Pages
             //  =============================================
@@ -158,7 +158,7 @@ class Pages_nested_menu {
             {
                 $root = '/'.implode('/', $IN->SEGS).'/';
             }
-            
+
             //  =============================================
             //  Make Sure Root Has a /
             //  =============================================
@@ -166,7 +166,7 @@ class Pages_nested_menu {
             $root = str_replace('&#47;', '/', $root);
         }
         $this->params['root'] = $root;
-        
+
         //  =============================================
         //  Order Pages
         //  =============================================
@@ -174,38 +174,38 @@ class Pages_nested_menu {
         $ordered = array();
         foreach($pages[1]['uris'] as $entry_id => $uri)
         {
-            
+
             $base = &$ordered['children'];
             $segs = array_filter(preg_split('/\//', $uri));
 			if(count($segs) == 0) $segs[] = '';
-			
+
 			foreach($segs as $seg)
             {
-            
+
 	            $tmp = $this->titles->result_array();
-            
-                if (! isset($base[$seg]) && isset($tmp)) 
+
+                if (! isset($base[$seg]) && isset($tmp))
                 {
-                    
+
                     $base[$seg]['order'] = (String)$this->element($order, $tmp[$title_counter], $tmp[$title_counter]['title']);
                     $base[$seg]['exp_channel_titles'] = $tmp[$title_counter];
                     $base[$seg]['children'] = array();
                 }
-                
+
                 $base = &$base[$seg]['children'];
             }
-            
+
             unset($tmp);
             $title_counter++;
         }
-        
+
         $this->ordered = nest_sort($ordered['children']);
-        
+
         //  =============================================
         //  Get HTML
         //  =============================================
         $this->get_html($this->ordered);
-        
+
         //  =============================================
         //  Add UL's if Necessary
         //  =============================================
@@ -214,7 +214,7 @@ class Pages_nested_menu {
             $this->return_data = '<ul>'.$this->return_data.'</ul>';
         }
     }
-    
+
     //  *********************************************
     //  Get HTML
     //  *********************************************
@@ -223,7 +223,7 @@ class Pages_nested_menu {
     //  ---------------------------------------------
     function get_html( $pages )
     {
-        
+
         foreach($pages as $page)
         {
             //  =============================================
@@ -231,18 +231,18 @@ class Pages_nested_menu {
             //  are displayed until proven un-displayed
             //  =============================================
             $displayed = true;
-            
+
             //  =============================================
             //  Track Path to Page
             //  =============================================
             $this->nesting_path[] = $page['exp_channel_titles']['url_title'];
             $page_path = $this->pages[1]['uris'][$page['exp_channel_titles']['entry_id']];
-            
+
             //  =============================================
             //  Check if Actually Displayed
             //  =============================================
             $displayed = $this->is_displayed($page);
-            
+
             //  =============================================
             //  Print out Displayed Pages
             //  =============================================
@@ -262,29 +262,33 @@ class Pages_nested_menu {
                 $variables['displayed'] = ($displayed)?'yes':'no';
                 $variables['count'] = $this->page_counter++;
                 $variables = $this->add_delimiters($variables);
-                
+
                 //  =============================================
                 //  Open LI
                 //  =============================================
-                
-                if(preg_match('/^\s*<li/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
-                {
-                
-                	// If this page equal to the current page?
-                    $class = "";
-                    if ($this->EE->uri->uri_string()==substr($page_path, 1)) {
-                    	$class = " class='active'";
+
+                if ($this->EE->TMPL->fetch_param('include_li')!="no") {
+
+                    if(preg_match('/^\s*<li/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
+                    {
+
+                    	// If this page equal to the current page?
+                        $class = "";
+                        if ($this->EE->uri->uri_string()==substr($page_path, 1)) {
+                        	$class = " class='active'";
+                        }
+
+                        $this->return_data .= '<li'.$class.'>';
                     }
-                    
-                    $this->return_data .= '<li'.$class.'>';
+
                 }
-                
+
                 //  =============================================
                 //  Replace Variables
                 //  =============================================
                 $this->return_data .= str_replace(array_keys($variables), $variables, $this->str);
             }
-            
+
             //  =============================================
             //  Check Drilling Down
             //  =============================================
@@ -299,7 +303,7 @@ class Pages_nested_menu {
             //  phew.
             //  ---------------------------------------------
             $drilling_down = preg_match('#^'.$page_path.'#', $this->params['root']) !== 0;
-            
+
             //  =============================================
             //  Begin Nesting Children
             //  =============================================
@@ -320,7 +324,7 @@ class Pages_nested_menu {
                     }
 					array_pop($this->nesting_path);
                 }
-                
+
                 //  =============================================
                 //  If there are, show them
                 //  =============================================
@@ -332,27 +336,29 @@ class Pages_nested_menu {
                         {
                             $this->return_data = preg_replace('/<&#47;li>\s*$/s', '', $this->return_data);
                         }
-                        
+
                         $this->return_data .= '<ul>';
                     }
-                    
+
                     $this->get_html($page['children']);
-                    
+
                     if($displayed)
                     {
                         $this->return_data .= '</ul>';
                     }
                 }
             }
-            
+
             //  =============================================
             //  Close LI
             //  =============================================
-            if($displayed && preg_match('/<&#47;li>\s*$/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
-            {
-                $this->return_data .= '</li>'."\r";
+            if ($this->EE->TMPL->fetch_param('include_li')!="no") {
+                if($displayed && preg_match('/<&#47;li>\s*$/s', preg_replace('/'.LD.'if.*?'.RD.'.*?'.LD.'&#47;if'.RD.'/s', '', $this->str)) === 0)
+                {
+                    $this->return_data .= '</li>'."\r";
+                }
             }
-            
+
             //  =============================================
             //  Pop Last Added Child Off
             //  =============================================
@@ -360,7 +366,7 @@ class Pages_nested_menu {
             array_pop($this->nesting_path);
         }
     }
-    
+
     //  *********************************************
     //  Is the Page Displayed?
     //  *********************************************
@@ -371,9 +377,9 @@ class Pages_nested_menu {
     function is_displayed( $page )
     {
         global $TMPL;
-        
+
         $displayed = true;
-        
+
         //  =============================================
         //  Make sure we're in the path
         //  =============================================
@@ -383,7 +389,7 @@ class Pages_nested_menu {
         //     $this->nesting_path[] = $page['exp_channel_titles']['url_title'];
         //     $nesting_added = true;
         // }
-        
+
         //  =============================================
         //  Check that we're within the status
         //  =============================================
@@ -392,7 +398,7 @@ class Pages_nested_menu {
         {
             $displayed = false;
         }
-        
+
         //  =============================================
         //  Check if we're Below the Root
         //  =============================================
@@ -404,7 +410,7 @@ class Pages_nested_menu {
             {
                 $displayed = false;
             }
-            
+
             //  =============================================
             //  Check if we Should Include the Root
             //  =============================================
@@ -413,7 +419,7 @@ class Pages_nested_menu {
                 $displayed = false;
             }
         }
-        
+
         //  =============================================
         //  Check That We're Above the Depth
         //  =============================================
@@ -421,13 +427,13 @@ class Pages_nested_menu {
         {
             $depth = $this->EE->TMPL->fetch_param('depth');
             $depth += count(array_filter(preg_split('/\//', $this->params['root'])));
-            
+
             if(count($this->nesting_path) > $depth)
             {
                 $displayed = false;
             }
         }
-        
+
         //  =============================================
         //  Remove the path, if we just added it
         //  =============================================
@@ -435,10 +441,10 @@ class Pages_nested_menu {
         // {
         //     array_pop($this->nesting_path);
         // }
-        
+
         return $displayed;
     }
-    
+
     //  *********************************************
     //  Add Delimiters to Variables
     //  *********************************************
@@ -456,7 +462,7 @@ class Pages_nested_menu {
         }
         return $return;;
     }
-    
+
     //  *********************************************
     //  Element!
     //  *********************************************
@@ -466,7 +472,7 @@ class Pages_nested_menu {
     {
         return (isset($array[$key])&&$array[$key]!='')?$array[$key]:$default;
     }
-    
+
 // ----------------------------------------
 //  Plugin Usage
 // ----------------------------------------
@@ -474,9 +480,9 @@ class Pages_nested_menu {
 // This function describes how the plugin is used.
 // Make sure and use output buffering
 
-function usage()
+public static function usage()
 {
-ob_start(); 
+ob_start();
 ?>
 This plugin creates a list of your Pages (created using the native Pages module). Basic syntax is as follows:
 
@@ -493,7 +499,7 @@ Another example showing how to style the 'current' page:
 <?php
 $buffer = ob_get_contents();
 
-ob_end_clean(); 
+ob_end_clean();
 
 return $buffer;
 }
@@ -502,18 +508,18 @@ return $buffer;
 
 function nest_sort( $seq )
 {
-      
+
     if(!count($seq)) return $seq;
-    
+
     $keys = array_keys($seq);
-    
+
     if(isset($seq[$keys[0]]['children']))
     {
         $seq[$keys[0]]['children'] = nest_sort($seq[$keys[0]]['children']);
     }
     $k = $seq[$keys[0]];
     $x = $y = array();
-    
+
     for($i=1; $i<count($keys); $i++)
     {
             if($seq[$keys[$i]]['order'] <= $k['order'])
@@ -525,7 +531,7 @@ function nest_sort( $seq )
                     $y[$keys[$i]] = $seq[$keys[$i]];
             }
     }
-    
+
     return nest_sort($x) + array($keys[0] => $k) + nest_sort($y);
 }
 
